@@ -17,7 +17,7 @@ DEP := $(ADEP) $(SRC:.c=.d)
 all: kernel
 
 kernel: $(OBJ) kernel.ld
-	$(LD) $(LFLAGS) -T kernel.ld -o $@ $(OBJ)
+	$(LD) $(LFLAGS) -T kernel.ld -Map kernel.map -o $@ $(OBJ)
 
 %.o: %.S
 	$(CC) -D__ASM_FILE__ -g -MMD -c $< -o $@

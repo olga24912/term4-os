@@ -13,9 +13,9 @@
 
 void make_idt_entry (struct idt_entry* entry, void* handler) {
     entry->reserved = 0;
-    entry->offset0 = (((uint64_t)handler) & 0xFFFF);
-    entry->offset1 = (((uint64_t)handler) >> 16) & 0xFFFF;
-    entry->offset2 = (((uint64_t)handler) >> 32) & 0xFFFFFFFF;
+    entry->offset0 = (((uint64_t) handler) & 0xFFFF);
+    entry->offset1 = ((((uint64_t) handler) >> 16) & 0xFFFF);
+    entry->offset2 = (((uint64_t) handler) >> 32) & 0xFFFFFFFF;
     entry->segment_selector = KERNEL_CODE;
     entry->flags = 0x8E00;
 }
@@ -49,8 +49,9 @@ extern void* isr_wrapper;
 void init_interrupt() {
     init_lpic();
     for (int i = 0; i < 256; ++i) {
-        make_idt_entry(idt + i, isr_wrapper);
+        make_idt_entry(idt + i, &isr_wrapper);
     }
+    printf("%p\n", isr_wrapper);
     static struct idt_ptr ptr;
     ptr.base = (uint64_t) idt;
     ptr.size = sizeof(idt) - 1;

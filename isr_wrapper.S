@@ -1,9 +1,9 @@
 .code64
+.section .text
 .globl isr_wrapper
 .align 16
 
 isr_wrapper:
-    loop: jmp loop
     push %rax
     push %rcx
     push %rdx
@@ -11,8 +11,8 @@ isr_wrapper:
     push %r9
     push %r10
     push %r11
-    cld
     call interrupt_handler
+
     pop %r11
     pop %r10
     pop %r9
@@ -20,4 +20,6 @@ isr_wrapper:
     pop %rdx
     pop %rcx
     pop %rax
+    sti
+
     iretq
