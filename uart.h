@@ -1,5 +1,5 @@
 #pragma once
 
-void init_uart();
+void init_uart(); // инициализация порта uart
 
-void putc(char c);
+void putc(char c); //запись в последовательный порти символа с

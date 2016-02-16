@@ -8,7 +8,7 @@ struct idt_ptr {
 	uint64_t base;
 } __attribute__((packed));
 
-struct idt_entry {
+struct idt_entry { //дискриптор обработки прерывания.
 	uint16_t offset0;
     uint16_t segment_selector;
     uint16_t flags;

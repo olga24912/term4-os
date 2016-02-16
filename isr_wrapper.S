@@ -3,8 +3,8 @@
 .globl isr_wrapper
 .align 16
 
-isr_wrapper:
-    push %rax
+isr_wrapper: /*контроллер прерывания*/
+    push %rax /*положили регистры на стек*/
     push %rcx
     push %rdx
     push %r8
@@ -12,9 +12,9 @@ isr_wrapper:
     push %r10
     push %r11
 
-    call interrupt_handler
+    call interrupt_handler /*вызвали функцию обработки прерывания*/
 
-    pop %r11
+    pop %r11 /*сняли регистры со стека*/
     pop %r10
     pop %r9
     pop %r8
@@ -23,9 +23,9 @@ isr_wrapper:
     pop %rax
 
 
-	movw $0x20, %dx
+	movw $0x20, %dx /*послали подтверждение прерывания EOI*/
 	movb $0x20, %al
 	outb %al, %dx
 
-	sti
+	sti /*разрешили еще прерываться.*/
     iretq

@@ -1,7 +1,4 @@
-#include <limits.h>
 #include "ioport.h"
-#include "uart.h"
-#include "stdarg.h"
 #include "io.h"
 #include "interrupt.h"
 
@@ -10,17 +7,12 @@
 
 
 void main(void) {
-    __asm__ volatile ("cli");
-    init_interrupt();
-    puts("init fin");
-    puts("init fin");
-    out8(CONTROL_PORT, (2 << 1)|(3 << 4));
-    out8(DATA_PORT, 255);
-    out8(DATA_PORT, 110);
-    puts("cd_port");
-    __asm__ volatile ("sti");
-    puts("main");
-    printf("%d\n", in8(0x21));
+    __asm__ volatile ("cli"); // запрещаем прерывание
+    init_interrupt(); // инициализируем прерывание
+    out8(CONTROL_PORT, (2 << 1)|(3 << 4)); //устанавливаем таймер прерывания
+    out8(DATA_PORT, 1);
+    out8(DATA_PORT, 0);
+    __asm__ volatile ("sti"); //разрешаем прерываться
 
     while (1);
 }
