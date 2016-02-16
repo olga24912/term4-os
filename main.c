@@ -10,7 +10,7 @@ void main(void) {
     __asm__ volatile ("cli"); // запрещаем прерывание
     init_interrupt(); // инициализируем прерывание
     out8(CONTROL_PORT, (2 << 1)|(3 << 4)); //устанавливаем таймер прерывания
-    out8(DATA_PORT, 1);
+    out8(DATA_PORT, 10);
     out8(DATA_PORT, 0);
     __asm__ volatile ("sti"); //разрешаем прерываться
 
