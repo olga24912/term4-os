@@ -26,6 +26,6 @@ isr_wrapper:
 	movw $0x20, %dx
 	movb $0x20, %al
 	outb %al, %dx
-	
+
 	sti
     iretq

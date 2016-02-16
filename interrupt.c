@@ -59,6 +59,9 @@ void init_interrupt() {
     set_idt(&ptr);
 }
 
+int cnt = 0;
+
 void interrupt_handler(void) {
-    puts("timer interrupt");
+    printf("current time is %d\n", cnt);
+    ++cnt;
 }

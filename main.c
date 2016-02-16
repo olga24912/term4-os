@@ -14,9 +14,9 @@ void main(void) {
     init_interrupt();
     puts("init fin");
     puts("init fin");
-    //out8(CONTROL_PORT, (2 << 1)|(3 << 4));
-    //out8(DATA_PORT, 255);
-    //out8(DATA_PORT, 110);
+    out8(CONTROL_PORT, (2 << 1)|(3 << 4));
+    out8(DATA_PORT, 255);
+    out8(DATA_PORT, 110);
     puts("cd_port");
     __asm__ volatile ("sti");
     puts("main");
