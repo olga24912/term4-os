@@ -11,6 +11,7 @@ isr_wrapper:
     push %r9
     push %r10
     push %r11
+
     call interrupt_handler
 
     pop %r11
@@ -20,6 +21,11 @@ isr_wrapper:
     pop %rdx
     pop %rcx
     pop %rax
-    sti
 
+
+	movw $0x20, %dx
+	movb $0x20, %al
+	outb %al, %dx
+	
+	sti
     iretq
