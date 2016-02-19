@@ -17,8 +17,34 @@ struct idt_entry { //дискриптор обработки прерывани�
     uint32_t reserved;
 } __attribute__((packed));
 
+struct interrupt_handler_args {
+	uint64_t rax;
+	uint64_t rcx;
+	uint64_t rdx;
+	uint64_t r8;
+	uint64_t r9;
+	uint64_t r10;
+	uint64_t r11;
+	uint64_t interrupt_id;
+	uint64_t error_code;
+};
+
 static inline void set_idt(const struct idt_ptr *ptr) {
     __asm__ volatile ("lidt (%0)" : : "a"(ptr));
+}
+
+static inline void interrupt_off() {
+	__asm__ volatile ("cli"); // запрещаем прерывание
+}
+
+static inline void interrupt_on() {
+	__asm__ volatile ("sti"); //разрешаем прерываться
+}
+
+static inline void send_EOI() {
+	__asm__ volatile ("movw $0x20, %dx"); /*послали подтверждение прерывания EOI*/
+	__asm__ volatile ("movb $0x20, %al");
+	__asm__ volatile ("outb %al, %dx");
 }
 
 void init_interrupt();

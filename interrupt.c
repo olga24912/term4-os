@@ -1,10 +1,8 @@
-#include <limits.h>
 #include "ioport.h"
-#include "uart.h"
-#include "stdarg.h"
 #include "io.h"
 #include "interrupt.h"
 #include "memory.h"
+#include "timer.h"
 
 #define CRM (0x20) //Command Register and Status Register Master
 #define CRS (0xA0) // Command Register and Status Register Slave
@@ -19,6 +17,8 @@ void make_idt_entry (struct idt_entry* entry, void* handler) { // инициал
     entry->segment_selector = KERNEL_CODE;
     entry->flags = 0x8E00; //выставляем тип interrupt gate
 }
+
+#include "make_idt.h"
 
 void init_lpic_slave() { // инициализация раба
     out8(CRS, (1 << 4)|1); // следующие три слова часть этой команды + 4 бит команда инициализации контролерра.
@@ -43,13 +43,9 @@ void init_lpic() { // инициализация Legacy PIC
 
 struct idt_entry idt[256];
 
-extern void* isr_wrapper;
-
 void init_interrupt() { // инициализация прерывания.
     init_lpic(); //  инициализируем Legacy PIC
-    for (int i = 0; i < 256; ++i) { // заполняем таблицу
-        make_idt_entry(idt + i, &isr_wrapper);
-    }
+    make_idt(idt);
     static struct idt_ptr ptr; // записываем указатель на таблицу
     ptr.base = (uint64_t) idt;
     ptr.size = sizeof(idt) - 1;
@@ -57,9 +53,13 @@ void init_interrupt() { // инициализация прерывания.
     set_idt(&ptr);
 }
 
-int cnt = 0;
 
-void interrupt_handler(void) { // обрабатывем прерывание.
-    printf("current time is %d\n", cnt);
-    ++cnt;
+void interrupt_handler(struct interrupt_handler_args args) {
+    printf("%d %d %d %d %d %d %d\n", (int) args.r8, (int) args.r9, (int) args.r10, (int) args.r11, (int) args.rax,
+           (int) args.rcx, (int) args.rdx);
+    printf("interrupt_id: %d, error_code: %d\n", (int)args.interrupt_id, (int)args.error_code);
+    if (args.interrupt_id == 0x20) {
+        timer_interrupt_handler();
+    }
+    send_EOI();
 }

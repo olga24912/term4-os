@@ -19,6 +19,10 @@ void print_int(int64_t x) {
         puts_in("-9223372036854775808");
         return;
     }
+    if (x == 0) {
+        puts_in("0");
+        return;
+    }
     if (x < 0) {
         putc('-');
         x = -x;
@@ -37,6 +41,10 @@ void print_int(int64_t x) {
 void print_hex(uint64_t x) {
     static char buff[30];
     puts_in("0x");
+    if (x == 0) {
+        puts_in("0");
+        return;
+    }
     int i = 0;
     for(; x != 0; ++i) {
         buff[i] = x%16 + '0';
