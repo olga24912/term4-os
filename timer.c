@@ -6,7 +6,7 @@
 #define CONTROL_PORT 0x43
 #define DATA_PORT 0x40
 
-const int div = 10*256 + 200;
+const int div = 59659;
 
 void init_timer() {
     out8(CONTROL_PORT, (2 << 1)|(3 << 4)); //устанавливаем таймер прерывания
