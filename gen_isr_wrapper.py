@@ -20,15 +20,10 @@ for i in range(0, 256):
     print("    jmp isr_wrapper")
     print()
 
-#        If the interrupt handler code is simply a stub that forwards to C code,
-#        you don't need to save all of the registers.
-#        You can assume that the C compiler will generate code that
-#        will be preserving rbx, rbp, rsi, rdi, and r12 thru r15.
-#        You should only need to save and restore rax, rcx, rdx, and r8 thru r11
-#
-#        http://stackoverflow.com/questions/6837392/how-to-save-the-registers-on-x86-64-for-an-interrupt-service-routine*/
+#http://www.x86-64.org/documentation/abi.pdf
+#page 21, not save register
 
-reg = ["rax", "rcx", "rdx", "r8", "r9", "r10", "r11"]
+reg = ["rax", "rcx", "rdx", "rsi", "rdi" ,"r8", "r9", "r10", "r11"]
 
 #interrupt controler
 print("isr_wrapper:")

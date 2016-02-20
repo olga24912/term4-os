@@ -1540,6 +1540,8 @@ isr_wrapper:
     push %r10
     push %r9
     push %r8
+    push %rdi
+    push %rsi
     push %rdx
     push %rcx
     push %rax
@@ -1549,6 +1551,8 @@ isr_wrapper:
     pop %rax
     pop %rcx
     pop %rdx
+    pop %rsi
+    pop %rdi
     pop %r8
     pop %r9
     pop %r10
