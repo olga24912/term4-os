@@ -2,7 +2,7 @@
 #define __INTERRUPT_H__
 
 #include <stdint.h>
-
+#include "ioport.h"
 struct idt_ptr {
 	uint16_t size;
 	uint64_t base;
@@ -42,9 +42,8 @@ static inline void interrupt_on() {
 }
 
 static inline void send_EOI() {
-	__asm__ volatile ("movw $0x20, %dx"); /*послали подтверждение прерывания EOI*/
-	__asm__ volatile ("movb $0x20, %al");
-	__asm__ volatile ("outb %al, %dx");
+	/*послали подтверждение прерывания EOI*/
+	out8(0x20, 0x20);
 }
 
 void init_interrupt();
