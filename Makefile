@@ -37,4 +37,4 @@ kernel: $(OBJ) kernel.ld
 
 .PHONY: clean
 clean:
-	rm -f kernel $(OBJ) $(DEP)
+	rm -f kernel $(OBJ) $(DEP) kernel.map
