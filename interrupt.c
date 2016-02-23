@@ -9,7 +9,7 @@
 #define DRM (0x21) // Interrupt Maske Register and Date Register Master
 #define DRS (0xA1) // Interrupt Maske Register and Date Register Slave
 
-void make_idt_entry (struct idt_entry* entry, void* handler) { // инициализатор дискриптора прерывания.
+void make_idt_entry(struct idt_entry *entry, void *handler) { // инициализатор дискриптора прерывания.
     entry->reserved = 0;
     entry->offset0 = (((uint64_t) handler) & 0xFFFF);   // записываем адрес контроллера прерывания
     entry->offset1 = ((((uint64_t) handler) >> 16) & 0xFFFF);
@@ -21,14 +21,14 @@ void make_idt_entry (struct idt_entry* entry, void* handler) { // инициал
 #include "make_idt.h"
 
 void init_lpic_slave() { // инициализация раба
-    out8(CRS, (1 << 4)|1); // следующие три слова часть этой команды + 4 бит команда инициализации контролерра.
+    out8(CRS, (1 << 4) | 1); // следующие три слова часть этой команды + 4 бит команда инициализации контролерра.
     out8(DRS, 0x28); // устанавливаем ICW
     out8(DRS, (1 << 1)); // номер входа, к которому подключен раб
     out8(DRS, 1); // устанавливаем режим контроллера прерывания.
 }
 
 void init_lpic_master() { //инициализация мастера, там все примерно так же.
-    out8(CRM, (1 << 4)|1);
+    out8(CRM, (1 << 4) | 1);
     out8(DRM, 0x20);
     out8(DRM, (1 << 2));
     out8(DRM, 1);
@@ -55,7 +55,7 @@ void init_interrupt() { // инициализация прерывания.
 
 
 void interrupt_handler(struct interrupt_handler_args args) {
-    printf("interrupt_id: %d, error_code: %d\n", (int)args.interrupt_id, (int)args.error_code);
+    printf("interrupt_id: %d, error_code: %d\n", (int) args.interrupt_id, (int) args.error_code);
     if (args.interrupt_id == 0x20) {
         timer_interrupt_handler();
     }

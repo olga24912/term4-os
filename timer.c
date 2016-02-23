@@ -9,7 +9,7 @@
 const int div = 59659;
 
 void init_timer() {
-    out8(CONTROL_PORT, (2 << 1)|(3 << 4)); //устанавливаем таймер прерывания
+    out8(CONTROL_PORT, (2 << 1) | (3 << 4)); //устанавливаем таймер прерывания
     //76543210
     //00110100
     //[3:1] "--- лежит 2,выбрали номер режима работы.
@@ -22,6 +22,6 @@ static double current_time = 0;
 const int FREC = 1193180;
 
 void timer_interrupt_handler(void) { // обрабатывем прерывание.
-    printf("current time is %d\n", (int)current_time);
+    printf("current time is %d\n", (int) current_time);
     current_time += div * 1.0 / FREC;
 }
