@@ -10,7 +10,7 @@ ASM := bootstrap.S videomem.S isr_wrapper.S
 AOBJ:= $(ASM:.S=.o)
 ADEP:= $(ASM:.S=.d)
 
-SRC := main.c uart.c io.c interrupt.c timer.c
+SRC := main.c uart.c io.c interrupt.c timer.c memory_map.c
 OBJ := $(AOBJ) $(SRC:.c=.o)
 DEP := $(ADEP) $(SRC:.c=.d)
 
