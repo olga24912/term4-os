@@ -6,6 +6,10 @@
 
 void* get_page(int k);
 
+void* get_page0(int k);
+
 void free_page(void* page_addr, int k);
 
 void init_buddy();
+
+

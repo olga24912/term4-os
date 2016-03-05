@@ -134,3 +134,11 @@ void init_buddy() {
 
     get_memory_map();
 }
+
+void* get_page0(int k) {
+    uint64_t* adr = get_page(k);
+    for (size_t i = 0; i < (1 << k)*PAGE_SIZE/sizeof(adr[0]); ++i) {
+        adr[i] = 0;
+    }
+    return adr;
+}
