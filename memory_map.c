@@ -43,7 +43,6 @@ static void cut_last_elem() {
         }
         memory_map[memory_map_size - 1].length = kernel.base_addr - memory_map[memory_map_size].base_addr;
     }
-
 }
 
 static void sort_mmap() {
@@ -59,6 +58,8 @@ static void sort_mmap() {
 }
 
 void get_memory_map(){
+    memory_map_size = 0;
+
     kernel.base_addr = (uint64_t)text_phys_begin;
     kernel.length = (uint64_t)bss_phys_end - kernel.base_addr;
     kernel.type = 0;
