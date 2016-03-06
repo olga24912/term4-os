@@ -2,7 +2,7 @@ CC ?= gcc
 LD ?= gcc
 
 CFLAGS := -g -m64 -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -ffreestanding \
-	-mcmodel=kernel -Wall -Wextra -Werror -pedantic -std=c99 \
+	-mcmodel=kernel -Wall -Wextra -Werror -std=c99 \
 	-Wframe-larger-than=4096 -Wstack-usage=4096 -Wno-unknown-warning-option
 LFLAGS := -nostdlib -z max-page-size=0x1000
 
@@ -10,7 +10,7 @@ ASM := bootstrap.S videomem.S isr_wrapper.S
 AOBJ:= $(ASM:.S=.o)
 ADEP:= $(ASM:.S=.d)
 
-SRC := main.c uart.c io.c interrupt.c timer.c memory_map.c buddy_allocator.c
+SRC := main.c uart.c io.c interrupt.c timer.c memory_map.c buddy_allocator.c paging.c SLAB_allocator.c
 OBJ := $(AOBJ) $(SRC:.c=.o)
 DEP := $(ADEP) $(SRC:.c=.d)
 

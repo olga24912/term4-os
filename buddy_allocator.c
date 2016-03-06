@@ -1,26 +1,13 @@
 #include "buddy_allocator.h"
+#include "util.h"
 
 #define MAX_ORDER 64
-
-#pragma pack(push, 1)
-struct page_descriptor {
-    int next_page_id;
-    int prev_page_id;
-    unsigned int in_list : 1;
-    unsigned int order : 6;
-};
-#pragma pack(pop)
 
 int* head;
 struct page_descriptor* descriptors;
 
 int pair_id(int id, int lv) {
     return id ^ (1 << lv);
-}
-
-
-int min(int a, int b) {
-    return a < b ? a : b;
 }
 
 void del_page(int id, int k) {
