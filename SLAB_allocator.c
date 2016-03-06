@@ -114,6 +114,7 @@ void* allocate_block(struct slabctl* slab) {
     }
     void* res = small_slab_get_buffer_addr(slab, slab->head);
     slab->head = *((uint16_t*)res);
+    slab->cnt_ref++;
     return res;
 }
 
@@ -128,4 +129,5 @@ void free_addr(void* addr) {
     }
     *((uint16_t*)addr) = sl->head;
     sl->head = id;
+    sl->cnt_ref--;
 }

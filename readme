@@ -33,3 +33,53 @@ init_interrupt "--- инициализация прерывания.
 interrupt_handler "--- собственно обработка прерывания.
 
 Настройка таймера находится в main
+
+
+-----------------ВТОРОЕ ЗАДАНИЕ-------------------
+1) memory_map.c/memory_map.h
+void get_memory_map() инициализация массива memory_map, где хранится
+адрес куска, размер и тип. Если сломать массив, то можно вызвать функцию еще раз и он
+починится.
+
+void print_mempry_map() вывести карту на экран.
+
+2) buddy_allocator.c/buddy_allocator.h
+page_descriptor описание одной страницы,
+храним иногода список для buddy allocator иногда
+информцию в каком slab лежит, для slab аллокатора.
+
+Так же храним, лежит ли этот адрес в списке совбодных кусков 1 если лежит
+и order это номер списка в buddy_allocator если лежит.
+
+init_buddy проинициализировать аллокатор, создать список и остальное.
+
+get_page --- отдать страничку
+get_page0 отдать страничку и обналить. Отдаем каждый раз 2^k
+
+free_page очищем по адресу 2^k страниц.
+
+2.5) paging.c
+
+void map_init() проинициализировать новую отображалку адресов.
+
+phys_t get_phys_adr(virt_t vad) отобразить этот адрес
+
+void map_adr(virt_t vad, phys_t pad, int big_page) связать этот виртуальный адрес с этим физическим и страничка может
+быть большой.
+
+
+3) SLAB_allocator.c/SLAB_allocator.h
+
+Главный описатель структурки slab
+struct slabctl {
+    uint16_t block_size; - размер блоков
+    uint16_t alignment; - выравнивание
+    uint16_t head; - начало списка
+    uint16_t cnt_ref; - количество выделеных
+};
+
+void* allocate_slab(unsigned int size, unsigned int al); выделить новый слаб с этим рамером блока и выравниванием
+
+void* allocate_block(struct slabctl* slab); выделить очередной блок
+
+void free_addr(void* addr); освободить блок по адресу. 
