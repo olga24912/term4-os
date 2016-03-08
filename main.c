@@ -14,11 +14,13 @@ void main(void) {
     init_buddy();
     map_init();
 
-    struct slabctl* mslab = allocate_slab(1000, 2);
+    struct slabctl** mslab = create_slab_system(1000, 2);
+    struct slabctl** mslab10 = create_slab_system(10, 2);
 
-    for (int i = 0; i < 10; ++i) {
-        void *a = allocate_block(mslab);
-        printf("%p\n", a);
+    for (int i = 0; i < 50000; ++i) {
+        void *a = allocate_block_in_slab_system(mslab10);
+        void *b = allocate_block_in_slab_system(mslab);
+        printf("%p %p\n", a, b);
         //free_addr(a);
     }
 

@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "SLAB_allocator.h"
 
 struct bufctl {
@@ -5,6 +6,8 @@ struct bufctl {
     struct bufctl* next_ctl;
     struct slab* slab_ctl;
 };
+
+void* heads;
 
 void* get_page_adr(void* adr) {
     return (void*)((uint64_t)adr&(~(PAGE_SIZE - 1)));
@@ -56,7 +59,7 @@ void* allocate_slab_small(unsigned int size, unsigned int al) {
     struct slabctl* slab_control = (struct slabctl*)((char*)buf + PAGE_SIZE - sizeof(struct slabctl));
     slab_control->alignment = al;
     slab_control->block_size = size;
-    slab_control->cnt_ref=0;
+    slab_control->cnt_ref = small_slab_cnt(slab_control);
     slab_control->head=0;
 
     descriptors[get_phys_adr((virt_t)((char*)buf))].slab = slab_control;
@@ -80,7 +83,7 @@ void* allocate_slab_big(unsigned int size, unsigned int al) {
 
     slab_control->alignment = al;
     slab_control->block_size = size;
-    slab_control->cnt_ref=0;
+    slab_control->cnt_ref = big_slab_cnt(slab_control, CNT_PAGES);
     slab_control->head=0;
 
     size_t cnt = big_slab_cnt(slab_control, CNT_PAGES);
@@ -110,11 +113,12 @@ void* allocate_block(struct slabctl* slab) {
     if (is_big_slab(slab)) {
         void* res = big_slab_get_buffer_addr(slab, slab->head, CNT_PAGES);
         slab->head = *((uint16_t*)res);
+        slab->cnt_ref--;
         return res;
     }
     void* res = small_slab_get_buffer_addr(slab, slab->head);
     slab->head = *((uint16_t*)res);
-    slab->cnt_ref++;
+    slab->cnt_ref--;
     return res;
 }
 
@@ -129,5 +133,36 @@ void free_addr(void* addr) {
     }
     *((uint16_t*)addr) = sl->head;
     sl->head = id;
-    sl->cnt_ref--;
+    sl->cnt_ref++;
+    if (sl->cnt_ref == 1) {
+        sl->next = *((struct slabctl**)sl->slab_list_head);
+        *((struct slabctl**)sl->slab_list_head) = sl;
+    }
+}
+
+void* allocate_block_in_slab_system (void* slab_sys) {
+    struct slabctl** head = slab_sys;
+    void* ret = allocate_block(*head);
+    if ((*head)->cnt_ref == 0) {
+        if ((*head)->next == (*head)) {
+            *head = allocate_slab((*head)->block_size, (*head)->alignment);
+            (*head)->slab_list_head = head;
+            (*head)->next = *head;
+        } else {
+            (*head) = (*head)->next;
+        }
+    }
+    return ret;
+}
+
+void* create_slab_system (unsigned int size, unsigned int al) {
+    if (heads == NULL) {
+        heads = get_page(0);
+    }
+    struct slabctl** head = heads;
+    heads = (void*)((uint64_t) heads + sizeof(struct slabctl**));
+    *head = (struct slabctl*)allocate_slab(size, al);
+    (*head)->slab_list_head = head;
+    (*head)->next = *head;
+    return head;
 }

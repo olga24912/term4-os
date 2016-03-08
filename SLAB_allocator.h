@@ -13,10 +13,12 @@ struct slabctl {
     uint16_t alignment;
     uint16_t head;
     uint16_t cnt_ref;
+    struct slabctl* next;
+    void* slab_list_head;
 };
 
-void* allocate_slab(unsigned int size, unsigned int al);
+void* create_slab_system (unsigned int size, unsigned int al);
 
-void* allocate_block(struct slabctl* slab);
+void* allocate_block_in_slab_system (void* slab_sys);
 
 void free_addr(void* addr);
