@@ -70,9 +70,13 @@ static inline void flush_tlb_addr(virt_t addr)
 static inline void flush_tlb(void)
 { store_pml4(load_pml4()); }
 
+#define USE_BIG_PAGE 1
+#define USE_BOOT_ALLOCATE (1 << 1)
+#define NOT_FLUSH_TLB (1 << 2)
+
 void map_init();
 
 phys_t get_phys_adr(virt_t vad);
 
-void map_adr(virt_t vad, phys_t pad, int big_page);
+void map_adr(virt_t vad, phys_t pad, int flags);
 #endif /*__PAGING_H__*/

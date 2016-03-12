@@ -74,7 +74,7 @@ void free_page(void* page_addr, int k) {
 }
 
 
-size_t boot_size = 1e6;
+size_t boot_size = 0;
 void* boot_mem;
 
 void init_boot() {
@@ -95,7 +95,7 @@ void* get_mem(size_t mem_size, size_t alignment) {
         res = (char *) ((((uint64_t)res + 1) / alignment) * alignment);
     }
     boot_size -= ((uint64_t)res - (uint64_t)boot_mem) + mem_size;
-    boot_mem = res + boot_size;
+    boot_mem = res + mem_size;
 
     for (size_t i = 0; i < mem_size; ++i) {
         res[i] = 0;
@@ -106,7 +106,11 @@ void* get_mem(size_t mem_size, size_t alignment) {
 
 void init_buddy() {
     get_memory_map();
-    size_t descriptors_size = ((memory_map[memory_map_size - 1].base_addr + memory_map[memory_map_size - 1].length))/PAGE_SIZE;
+
+    size_t  max_mem_size = ((memory_map[memory_map_size - 1].base_addr + memory_map[memory_map_size - 1].length));
+
+    boot_size = max_mem_size/(2<<20)*PAGE_SIZE*2;
+    size_t descriptors_size = max_mem_size/PAGE_SIZE;
 
     max_order = 1;
     while ((1ll<<max_order) <= (int)descriptors_size) {
