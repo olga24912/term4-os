@@ -69,7 +69,7 @@ phys_t get_phys_adr(virt_t vad) {
 
 
 void map_init() {
-    pml4 = get_page0(0);
+    pml4 = get_mem(PAGE_SIZE, PAGE_SIZE);
 
     for (phys_t i = 0; i < memory_map[memory_map_size - 1].base_addr + memory_map[memory_map_size - 1].length; i += (1 << 21)) {
         map_adr(i + HIGH_BASE, i, 1);

@@ -73,30 +73,49 @@ void free_page(void* page_addr, int k) {
     }
 }
 
+
+size_t boot_size = 1e6;
+void* boot_mem;
+
+void init_boot() {
+    for (size_t i = 0; i < memory_map_size; ++i) {
+        if (memory_map[i].type == 1) {
+            if (memory_map[i].length >= boot_size) {
+                boot_mem = va(memory_map[i].base_addr);
+                memory_map[i].base_addr += boot_size;
+                memory_map[i].length -= boot_size;
+            }
+        }
+    }
+}
+
+void* get_mem(size_t mem_size, size_t alignment) {
+    char* res = boot_mem;
+    if (alignment != 0) {
+        res = (char *) ((((uint64_t)res + 1) / alignment) * alignment);
+    }
+    boot_size -= ((uint64_t)res - (uint64_t)boot_mem) + mem_size;
+    boot_mem = res + boot_size;
+
+    for (size_t i = 0; i < mem_size; ++i) {
+        res[i] = 0;
+    }
+
+    return res;
+}
+
 void init_buddy() {
     get_memory_map();
 
     size_t head_size = MAX_ORDER * sizeof(head[0]);
     size_t descriptors_size = ((memory_map[memory_map_size - 1].base_addr + memory_map[memory_map_size - 1].length))/PAGE_SIZE;
 
-    int init_head = 0;
-    int init_descriptor = 0;
-    for (size_t i = 0; i < memory_map_size; ++i) {
-        if (memory_map[i].type == 1) {
-            if (init_head == 0 && memory_map[i].length >= head_size) {
-                head = va(memory_map[i].base_addr);
-                memory_map[i].base_addr += head_size;
-                memory_map[i].length -= head_size;
-                init_head = 1;
-            }
-            if (init_descriptor == 0 && memory_map[i].length >= descriptors_size) {
-                descriptors = va(memory_map[i].base_addr);
-                memory_map[i].base_addr += descriptors_size;
-                memory_map[i].length -= descriptors_size;
-                init_descriptor = 1;
-            }
-        }
-    }
+    boot_size += head_size + descriptors_size;
+
+    init_boot();
+
+    head = get_mem(head_size, 0);
+    descriptors = get_mem(descriptors_size, 0);
 
     for (size_t i = 0; i < MAX_ORDER; ++i) {
         head[i] = -1;

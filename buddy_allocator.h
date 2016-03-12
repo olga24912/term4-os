@@ -28,4 +28,8 @@ void free_page(void* page_addr, int k);
 
 void init_buddy();
 
+void init_boot();
+
+void* get_mem(size_t mem_size, size_t alignment);
+
 
