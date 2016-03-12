@@ -82,4 +82,4 @@ void* allocate_slab(unsigned int size, unsigned int al); выделить нов
 
 void* allocate_block(struct slabctl* slab); выделить очередной блок
 
-void free_addr(void* addr); освободить блок по адресу.
+void free_block(void* addr); освободить блок по адресу.

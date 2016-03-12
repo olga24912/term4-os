@@ -122,7 +122,7 @@ void* allocate_block(struct slabctl* slab) {
     return res;
 }
 
-void free_addr(void* addr) {
+void free_block(void *addr) {
     void* pg_addr = get_page_adr(addr);
     struct slabctl* sl = descriptors[get_phys_adr((virt_t)pg_addr)].slab;
     int id;

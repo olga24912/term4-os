@@ -21,7 +21,7 @@ void main(void) {
         void *a = allocate_block_in_slab_system(mslab10);
         void *b = allocate_block_in_slab_system(mslab);
         printf("%p %p\n", a, b);
-        //free_addr(a);
+        //free_block(a);
     }
 
     init_interrupt(); // инициализируем прерывание

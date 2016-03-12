@@ -21,4 +21,4 @@ void* create_slab_system (unsigned int size, unsigned int al);
 
 void* allocate_block_in_slab_system (void* slab_sys);
 
-void free_addr(void* addr);
+void free_block(void *addr);
