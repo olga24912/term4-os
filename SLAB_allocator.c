@@ -140,7 +140,7 @@ void free_block(void *addr) {
     }
 }
 
-void* allocate_block_in_slab_system (void* slab_sys) {
+void* allocate_block_in_slab_system (struct slabctl** slab_sys) {
     struct slabctl** head = slab_sys;
     void* ret = allocate_block(*head);
     if ((*head)->cnt_ref == 0) {
@@ -155,7 +155,7 @@ void* allocate_block_in_slab_system (void* slab_sys) {
     return ret;
 }
 
-void* create_slab_system (unsigned int size, unsigned int al) {
+struct slabctl** create_slab_system (unsigned int size, unsigned int al) {
     if (heads == NULL) {
         heads = get_page(0);
     }

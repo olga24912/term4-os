@@ -17,8 +17,8 @@ struct slabctl {
     void* slab_list_head;
 };
 
-void* create_slab_system (unsigned int size, unsigned int al);
+struct slabctl** create_slab_system (unsigned int size, unsigned int al);
 
-void* allocate_block_in_slab_system (void* slab_sys);
+void* allocate_block_in_slab_system (struct slabctl** slab_sys);
 
 void free_block(void *addr);
