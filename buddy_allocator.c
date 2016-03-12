@@ -1,7 +1,7 @@
 #include "buddy_allocator.h"
 #include "util.h"
 
-#define MAX_ORDER 64
+int max_order;
 
 int* head;
 struct page_descriptor* descriptors;
@@ -41,10 +41,10 @@ void add_page(int id, int k) {
 
 void* get_page(int k) {
     int lv = k;
-    while (head[lv] == -1 && lv < MAX_ORDER) {
+    while (head[lv] == -1 && lv < max_order) {
         ++lv;
     }
-    if (lv == MAX_ORDER) {
+    if (lv == max_order) {
         return 0;
     }
     for (; lv > k; --lv) {
@@ -106,9 +106,14 @@ void* get_mem(size_t mem_size, size_t alignment) {
 
 void init_buddy() {
     get_memory_map();
-
-    size_t head_size = MAX_ORDER * sizeof(head[0]);
     size_t descriptors_size = ((memory_map[memory_map_size - 1].base_addr + memory_map[memory_map_size - 1].length))/PAGE_SIZE;
+
+    max_order = 1;
+    while ((1ll<<max_order) <= (int)descriptors_size) {
+        ++max_order;
+    }
+
+    size_t head_size = max_order * sizeof(head[0]);
 
     boot_size += head_size + descriptors_size;
 
@@ -117,7 +122,7 @@ void init_buddy() {
     head = get_mem(head_size, 0);
     descriptors = get_mem(descriptors_size, 0);
 
-    for (size_t i = 0; i < MAX_ORDER; ++i) {
+    for (size_t i = 0; i < (size_t)max_order; ++i) {
         head[i] = -1;
     }
 
