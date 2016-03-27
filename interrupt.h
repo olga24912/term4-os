@@ -36,12 +36,18 @@ static inline void set_idt(const struct idt_ptr *ptr) {
     __asm__ volatile ("lidt (%0)" : : "a"(ptr));
 }
 
+extern int interrupt_off_cnt;
+
 static inline void interrupt_off() {
-    __asm__ volatile ("cli"); // запрещаем прерывание
+    if (__sync_fetch_and_add(&interrupt_off_cnt, 1) == 0) {
+        __asm__ volatile ("cli"); // запрещаем прерывание
+    }
 }
 
 static inline void interrupt_on() {
-    __asm__ volatile ("sti"); //разрешаем прерываться
+    if (__sync_fetch_and_add(&interrupt_off_cnt, -1) == 1) {
+        __asm__ volatile ("sti"); //разрешаем прерываться
+    }
 }
 
 static inline void send_EOI() {
