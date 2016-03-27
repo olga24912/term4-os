@@ -36,17 +36,25 @@ static inline void set_idt(const struct idt_ptr *ptr) {
     __asm__ volatile ("lidt (%0)" : : "a"(ptr));
 }
 
-extern int interrupt_off_cnt;
+extern int critical_section_depth;
+
 
 static inline void interrupt_off() {
-    if (__sync_fetch_and_add(&interrupt_off_cnt, 1) == 0) {
-        __asm__ volatile ("cli"); // запрещаем прерывание
-    }
+    __asm__ volatile ("cli"); // запрещаем прерывание
 }
 
 static inline void interrupt_on() {
-    if (__sync_fetch_and_add(&interrupt_off_cnt, -1) == 1) {
-        __asm__ volatile ("sti"); //разрешаем прерываться
+    __asm__ volatile ("sti"); //разрешаем прерываться
+}
+
+static inline void start_critical_section() {
+    interrupt_off();
+    __sync_fetch_and_add(&critical_section_depth, 1);
+}
+
+static inline void end_critical_section() {
+    if (__sync_fetch_and_add(&critical_section_depth, -1) == 1) {
+        interrupt_on();
     }
 }
 

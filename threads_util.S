@@ -4,8 +4,6 @@
 .globl switch_threads
 
 start_thread:
-        movq %rax, %rdi // return of switch_threads push in arg of check_thread_finish
-
         callq check_thread_finished
 
         popq %rax         // get thread function address
@@ -13,7 +11,8 @@ start_thread:
 
         callq *%rax       // call real thread function
 
-        callq finish_thread
+        movq %rax, %rdi
+        callq finish_current_thread
         loop: jmp loop
 
 // int switch_threads(void **old_sp, void *new_sp); // C signature return previous thread
@@ -24,8 +23,6 @@ switch_threads:
         pushq %r13
         pushq %r14
         pushq %r15
-
-        callq get_current_thread
 
         movq %rsp, (%rdi) // save SP
         movq %rsi, %rsp   // restore SP

@@ -9,7 +9,7 @@
 #define DRM (0x21) // Interrupt Maske Register and Date Register Master
 #define DRS (0xA1) // Interrupt Maske Register and Date Register Slave
 
-int interrupt_off_cnt = 0;
+int critical_section_depth = 0;
 
 void make_idt_entry(struct idt_entry *entry, void *handler) { // инициализатор дискриптора прерывания.
     entry->reserved = 0;

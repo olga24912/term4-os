@@ -2,7 +2,9 @@
 
 __attribute__((noreturn))
 static inline void hang () {
-    while(1);
+    while(1) {
+        __asm__ volatile ("hlt");
+    };
 }
 
 static inline int min(int a, int b) {
