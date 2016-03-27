@@ -1,5 +1,6 @@
 #include "buddy_allocator.h"
 #include "util.h"
+#include "lock.h"
 
 int max_order;
 
@@ -39,12 +40,17 @@ void add_page(int id, int k) {
     }
 }
 
+
+static struct spinlock buddy_lock;
+
 void* get_page(int k) {
+    lock(&buddy_lock);
     int lv = k;
     while (head[lv] == -1 && lv < max_order) {
         ++lv;
     }
     if (lv == max_order) {
+        unlock(&buddy_lock);
         return 0;
     }
     for (; lv > k; --lv) {
@@ -55,10 +61,12 @@ void* get_page(int k) {
     }
     int val = head[k];
     del_page(head[k], k);
+    unlock(&buddy_lock);
     return va(val * (uint64_t)PAGE_SIZE);
 }
 
 void free_page(void* page_addr, int k) {
+    lock(&buddy_lock);
     int id = pa(page_addr)/PAGE_SIZE;
     while (1) {
         int pid = pair_id(id, k);
@@ -71,6 +79,7 @@ void free_page(void* page_addr, int k) {
             break;
         }
     }
+    unlock(&buddy_lock);
 }
 
 

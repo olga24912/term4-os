@@ -1,6 +1,9 @@
 #include <stddef.h>
 #include "SLAB_allocator.h"
 
+
+static struct spinlock slab_lock;
+
 struct bufctl {
     void* buf_adr;
     struct bufctl* next_ctl;
@@ -98,11 +101,13 @@ void* allocate_slab(unsigned int size, unsigned int al) {
     if (al == 0) {
         al = 1;
     }
+    void* ret;
     if (size*8 <= PAGE_SIZE) {
-        return allocate_slab_small(size, al);
+        ret = allocate_slab_small(size, al);
     } else {
-        return allocate_slab_big(size, al);
+        ret = allocate_slab_big(size, al);
     }
+    return ret;
 }
 
 int is_big_slab(struct slabctl* slab) {
@@ -125,6 +130,7 @@ void* allocate_block(struct slabctl* slab) {
 void free_block(void *addr) {
     void* pg_addr = get_page_adr(addr);
     struct slabctl* sl = descriptors[get_phys_adr((virt_t)pg_addr)].slab;
+    lock(&sl->lock);
     int id;
     if (is_big_slab(sl)) {
         id = get_big_id(sl, addr, CNT_PAGES);
@@ -138,10 +144,12 @@ void free_block(void *addr) {
         sl->next = *((struct slabctl**)sl->slab_list_head);
         *((struct slabctl**)sl->slab_list_head) = sl;
     }
+    unlock(&sl->lock);
 }
 
 void* allocate_block_in_slab_system (struct slabctl** slab_sys) {
     struct slabctl** head = slab_sys;
+    lock(&(*head)->lock);
     void* ret = allocate_block(*head);
     if ((*head)->cnt_ref == 0) {
         if ((*head)->next == (*head)) {
@@ -152,10 +160,12 @@ void* allocate_block_in_slab_system (struct slabctl** slab_sys) {
             (*head) = (*head)->next;
         }
     }
+    unlock(&(*head)->lock);
     return ret;
 }
 
 struct slabctl** create_slab_system (unsigned int size, unsigned int al) {
+    lock(&slab_lock);
     if (heads == NULL) {
         heads = get_page(0);
     }
@@ -164,5 +174,6 @@ struct slabctl** create_slab_system (unsigned int size, unsigned int al) {
     *head = (struct slabctl*)allocate_slab(size, al);
     (*head)->slab_list_head = head;
     (*head)->next = *head;
+    unlock(&slab_lock);
     return head;
 }
