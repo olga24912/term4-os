@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "ioport.h"
+#include "io.h"
 
 struct idt_ptr {
     uint16_t size;
@@ -36,26 +37,12 @@ static inline void set_idt(const struct idt_ptr *ptr) {
     __asm__ volatile ("lidt (%0)" : : "a"(ptr));
 }
 
-extern int critical_section_depth;
-
-
 static inline void interrupt_off() {
     __asm__ volatile ("cli"); // запрещаем прерывание
 }
 
 static inline void interrupt_on() {
     __asm__ volatile ("sti"); //разрешаем прерываться
-}
-
-static inline void start_critical_section() {
-    interrupt_off();
-    __sync_fetch_and_add(&critical_section_depth, 1);
-}
-
-static inline void end_critical_section() {
-    if (__sync_fetch_and_add(&critical_section_depth, -1) == 1) {
-        interrupt_on();
-    }
 }
 
 static inline void send_EOI() {

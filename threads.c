@@ -3,6 +3,7 @@
 #include "util.h"
 #include "buddy_allocator.h"
 #include "assert.h"
+#include "lock.h"
 
 #define MAX_THREADS (1 << 16)
 typedef enum {NOT_STARTED = 0, RUNNING, FINISHED, WAIT_JOIN} thread_state;
@@ -92,7 +93,7 @@ void switch_threads(void **old_sp, void *new_sp);
 
 
 void check_thread_finished() {
-    printf("check thread fin %d\n", previous_thread);
+    //printf("check thread fin %d\n", previous_thread);
     volatile struct thread* thread = tp.threads + previous_thread;
 
     if (thread->state == FINISHED && previous_thread != current_thread) {
@@ -113,10 +114,10 @@ void run_thread(pid_t tid) {
 
     struct thread *othread = (struct thread*)tp.threads + ot;
 
-    printf("before switch from %d to %d\n", ot, tid);
+    //printf("before switch from %d to %d\n", ot, tid);
     switch_threads(&othread->stack_pointer, thread->stack_pointer);
 
-    printf("after switch from %d to %d, pr_t %d\n", ot, tid, previous_thread);
+    //printf("after switch from %d to %d, pr_t %d\n", ot, tid, previous_thread);
 
     check_thread_finished();
 }

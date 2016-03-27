@@ -2,6 +2,7 @@
 #include "io.h"
 #include "timer.h"
 #include "interrupt.h"
+#include "threads.h"
 
 #define CONTROL_PORT 0x43
 #define DATA_PORT 0x40
@@ -19,9 +20,16 @@ void init_timer() {
 }
 
 static double current_time = 0;
+static double last_scheduler_time = 0;
+
 const int FREC = 1193180;
 
 void timer_interrupt_handler(void) { // обрабатывем прерывание.
-    printf("current time is %d\n", (int) current_time);
     current_time += div * 1.0 / FREC;
+
+    if (current_time - last_scheduler_time > 0.01) {
+        last_scheduler_time = current_time;
+        send_EOI();
+        yield();
+    }
 }

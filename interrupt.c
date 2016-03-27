@@ -9,8 +9,6 @@
 #define DRM (0x21) // Interrupt Maske Register and Date Register Master
 #define DRS (0xA1) // Interrupt Maske Register and Date Register Slave
 
-int critical_section_depth = 0;
-
 void make_idt_entry(struct idt_entry *entry, void *handler) { // инициализатор дискриптора прерывания.
     entry->reserved = 0;
     entry->offset0 = (((uint64_t) handler) & 0xFFFF);   // записываем адрес контроллера прерывания
@@ -21,6 +19,7 @@ void make_idt_entry(struct idt_entry *entry, void *handler) { // инициал�
 }
 
 #include "make_idt.h"
+#include "threads.h"
 
 void init_lpic_slave() { // инициализация раба
     out8(CRS, (1 << 4) | 1); // следующие три слова часть этой команды + 4 бит команда инициализации контролерра.
@@ -57,7 +56,8 @@ void init_interrupt() { // инициализация прерывания.
 
 
 void interrupt_handler(struct interrupt_handler_args args) {
-    printf("interrupt_id: %d, error_code: %d\n", (int) args.interrupt_id, (int) args.error_code);
+    printf("interrupt_id: %d, error_code: %d, current_thread: %d\n", (int) args.interrupt_id, (int) args.error_code,
+           (int)get_current_thread());
     if (args.interrupt_id == 0x20) {
         timer_interrupt_handler();
     }

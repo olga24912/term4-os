@@ -5,6 +5,7 @@
 
 start_thread:
         callq check_thread_finished
+        callq end_critical_section   //section was open in yield
 
         popq %rax         // get thread function address
         popq %rdi         // get thread function args

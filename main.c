@@ -112,6 +112,21 @@ void test_join() {
     assert(ret == fun_join);
 }
 
+
+void* fun_loop(void *arg __attribute__((unused))) {
+    while(1) {
+        //printf("Hello, I am %d\n", get_current_thread());
+    }
+    return 0;
+}
+
+void test_timer_interrupt() {
+    create_thread(fun_loop, 0);
+    create_thread(fun_loop, 0);
+    create_thread(fun_loop, 0);
+    hang();
+}
+
 void main(void) {
     start_critical_section();
     get_memory_map();
@@ -120,13 +135,16 @@ void main(void) {
 
     init_threads();
 
-    test_finish();
+    //test_finish();
     //test_switch_and_arg();
     //test_lock();
     //test_join();
 
     init_interrupt(); // инициализируем прерывание
     init_timer();
-    //end_critical_section();
+    end_critical_section();
+
+    test_timer_interrupt();
+
     hang();
 }

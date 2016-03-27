@@ -10,3 +10,7 @@ struct spinlock {
 void lock(struct spinlock *lock);
 
 void unlock(struct spinlock *lock);
+
+void end_critical_section();
+
+void start_critical_section();
