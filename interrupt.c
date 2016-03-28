@@ -56,8 +56,8 @@ void init_interrupt() { // инициализация прерывания.
 
 
 void interrupt_handler(struct interrupt_handler_args args) {
-    printf("interrupt_id: %d, error_code: %d, current_thread: %d\n", (int) args.interrupt_id, (int) args.error_code,
-           (int)get_current_thread());
+   // printf("interrupt_id: %d, error_code: %d, current_thread: %d\n", (int) args.interrupt_id, (int) args.error_code,
+   //        (int)get_current_thread());
     if (args.interrupt_id == 0x20) {
         timer_interrupt_handler();
     }

@@ -46,8 +46,8 @@ volatile struct thread *get_free_thread() {
 
     tp.next[first] = tp.next[1];
     tp.prev[first] = 1;
-    tp.next[1] = first;
     tp.prev[tp.next[1]] = first;
+    tp.next[1] = first;
 
     return &tp.threads[first];
 }
@@ -126,13 +126,14 @@ void finish_current_thread(void* val) {
     start_critical_section();
     int ct = get_current_thread();
 
-    printf("thread finish %d\n", ct);
+    //printf("thread finish %d\n", ct);
 
     volatile struct thread* current_t = tp.threads + ct;
     current_t->state = FINISHED;
     current_t->ret_val = val;
 
 
+    //printf("%d %d %d\n", ct, tp.next[ct], tp.prev[ct]);
     tp.prev[tp.next[ct]] = tp.prev[ct];
     tp.next[tp.prev[ct]] = tp.next[ct];
 
@@ -143,9 +144,13 @@ void finish_current_thread(void* val) {
 
 void yield() {
     start_critical_section();
+    //printf("%d try change thread\n", get_current_thread());
     for (pid_t i = tp.next[current_thread];; i = tp.next[current_thread]) {
+        //printf("i = %d, tp.threads[i].state = %d\n", i, tp.threads[i].state);
         if (i == 0 || tp.threads[i].state != RUNNING) continue;
+        //printf("%d\n", i);
         run_thread(i);
+        //printf("continue in %d, after change %d\n", get_current_thread(),i);
         break;
     }
     end_critical_section();

@@ -10,7 +10,7 @@ ASM := bootstrap.S videomem.S isr_wrapper.S threads_util.S
 AOBJ:= $(ASM:%.S=.build/%.o)
 ADEP:= $(ASM:%.S=.build/%.d)
 
-SRC := main.c uart.c io.c interrupt.c timer.c memory_map.c buddy_allocator.c paging.c SLAB_allocator.c threads.c lock.c
+SRC := main.c uart.c io.c interrupt.c timer.c memory_map.c buddy_allocator.c paging.c SLAB_allocator.c threads.c lock.c test_thread.c
 COBJ := $(SRC:%.c=.build/%.o)
 CDEP := $(SRC:%.c=.build/%.d)
 

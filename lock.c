@@ -24,7 +24,7 @@ void unlock(struct spinlock *lock)
 volatile int critical_section_depth = 0;
 
 void start_critical_section() {
-    //printf("critical section start %d\n", critical_section_depth);
+    //printf("critical section start %d, current thread: %d \n", critical_section_depth, get_current_thread());
     interrupt_off();
     __sync_fetch_and_add(&critical_section_depth, 1);
 }
