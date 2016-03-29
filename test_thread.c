@@ -1,5 +1,6 @@
 #include "test_thread.h"
 
+
 void* fun(void *arg) {
     printf("fun1 arg:%d\n", *(pid_t*)arg);
     yield();
