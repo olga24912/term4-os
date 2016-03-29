@@ -19,7 +19,7 @@ void main(void) {
     init_threads();
 
     //test_finish();
-    //test_switch_and_arg();
+    test_switch_and_arg();
     //test_lock();
     //test_join();
 
@@ -28,7 +28,7 @@ void main(void) {
     end_critical_section();
 
     //test_timer_interrupt();
-    test_slab();
+    //test_slab();
 
     hang();
 }

@@ -1,19 +1,14 @@
 #include "test_thread.h"
 
 void* fun(void *arg) {
-    while (true) {
-        printf("Hello world1\n");
-        run_thread(*(pid_t *)arg);
-    }
+    printf("fun1 arg:%d\n", *(pid_t*)arg);
+    yield();
     return 0;
 }
 
 void* fun2(void *arg) {
-    for (int i = 0; i < 100; ++i) {
-        printf("Hello world179\n");
-        run_thread(*(pid_t *)arg);
-    }
-    run_thread(1);
+    printf("fun2 arg:%d\n", *(pid_t*)arg);
+    yield();
     return 0;
 }
 
