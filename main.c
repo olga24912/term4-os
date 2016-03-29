@@ -18,17 +18,17 @@ void main(void) {
 
     init_threads();
 
-    //test_finish();
     test_switch_and_arg();
-    //test_lock();
-    //test_join();
+    test_finish();
+    test_lock();
+    test_join();
 
     init_interrupt(); // инициализируем прерывание
     init_timer();
     end_critical_section();
 
-    //test_timer_interrupt();
-    //test_slab();
+    test_timer_interrupt();
+    test_slab();
 
     hang();
 }
