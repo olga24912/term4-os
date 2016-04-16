@@ -16,6 +16,7 @@ void main(void) {
     get_memory_map();
     init_buddy();
     map_init();
+    print_mempry_map();
     init_malloc_small();
 
     init_threads();

@@ -27,4 +27,6 @@ struct cpio_header {
     char chksum[8];
 } __attribute__((packed));
 
+extern void* init_ref;
+
 #endif /*__INITRAMFS_H__*/
