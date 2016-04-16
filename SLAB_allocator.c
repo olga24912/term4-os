@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include "SLAB_allocator.h"
+#include "assert.h"
 
+#define MALLOC_SMALL_MAX_SIZE 256
 
 static struct spinlock slab_lock;
 
@@ -176,4 +178,18 @@ struct slabctl** create_slab_system (unsigned int size, unsigned int al) {
     (*head)->next = *head;
     unlock(&slab_lock);
     return head;
+}
+
+struct slabctl** small_slabs[MALLOC_SMALL_MAX_SIZE];
+
+void init_malloc_small() {
+    for (unsigned i = 1; i < MALLOC_SMALL_MAX_SIZE; ++i) {
+        small_slabs[i] = create_slab_system(i, 1);
+    }
+}
+
+void* malloc_small (unsigned int size) {
+    assert(size > 0);
+    assert(size < MALLOC_SMALL_MAX_SIZE);
+    return allocate_block_in_slab_system(small_slabs[size]);
 }

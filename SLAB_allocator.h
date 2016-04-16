@@ -25,3 +25,7 @@ struct slabctl** create_slab_system (unsigned int size, unsigned int al);
 void* allocate_block_in_slab_system (struct slabctl** slab_sys);
 
 void free_block(void *addr);
+
+void init_malloc_small();
+
+void* malloc_small(unsigned int size);

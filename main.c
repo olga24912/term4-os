@@ -8,6 +8,7 @@
 #include "threads.h"
 #include "lock.h"
 #include "test_thread.h"
+#include "file_system.h"
 
 
 void main(void) {
@@ -15,20 +16,45 @@ void main(void) {
     get_memory_map();
     init_buddy();
     map_init();
+    init_malloc_small();
 
     init_threads();
-
-    test_switch_and_arg();
-    test_finish();
-    test_lock();
-    test_join();
-
     init_interrupt(); // инициализируем прерывание
     init_timer();
-    end_critical_section();
 
-    test_timer_interrupt();
-    test_slab();
+    init_file_system();
+
+    int id = open("/file", O_CREAT|O_WRONLY|O_TRUNC);
+    open("/file2", O_CREAT|O_WRONLY|O_TRUNC);
+    open("/file3", O_WRONLY|O_TRUNC);
+
+    mkdir("/dir1");
+    mkdir("/dir1/dir2");
+
+    open("/dir1/dir2/file2", O_CREAT|O_WRONLY|O_TRUNC);
+    open("/dir1/file179", O_CREAT|O_WRONLY|O_TRUNC);
+
+    for (int i = 0; i < 50; ++i) {
+        write(id, "a", 1);
+    }
+
+    close(id);
+
+    id = open("/file", O_RDONLY);
+
+    printf("%d\n", id);
+    char s[3];
+    int size = 0;
+    while ((size = read(id, s, 3)) > 0) {
+        for (int i= 0; i < size; ++i) {
+            printf("%c", s[i]);
+        }
+    }
+    printf("\n");
+
+    print_file_system();
+
+    end_critical_section();
 
     hang();
 }
