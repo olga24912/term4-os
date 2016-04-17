@@ -28,5 +28,8 @@ struct cpio_header {
 } __attribute__((packed));
 
 extern void* init_ref;
+extern void* init_ref_end;
+
+void initramfs_to_fs();
 
 #endif /*__INITRAMFS_H__*/

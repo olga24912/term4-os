@@ -9,7 +9,7 @@
 #include "lock.h"
 #include "test_thread.h"
 #include "file_system.h"
-
+#include "initramfs.h"
 
 void main(void) {
     start_critical_section();
@@ -25,7 +25,9 @@ void main(void) {
 
     init_file_system();
 
-    int id = open("/file", O_CREAT|O_WRONLY|O_TRUNC);
+    initramfs_to_fs();
+
+    /*int id = open("/file", O_CREAT|O_WRONLY|O_TRUNC);
     open("/file2", O_CREAT|O_WRONLY|O_TRUNC);
     open("/file3", O_WRONLY|O_TRUNC);
 
@@ -51,7 +53,7 @@ void main(void) {
             printf("%c", s[i]);
         }
     }
-    printf("\n");
+    printf("\n");*/
 
     print_file_system();
 

@@ -12,6 +12,7 @@ extern char text_phys_begin[];
 extern char bss_phys_end[];
 
 void* init_ref;
+void* init_ref_end;
 
 size_t memory_map_size = 0;
 struct memory_map_entry memory_map[MMAP_SIZE];
@@ -76,6 +77,7 @@ void find_initranfs_mode(uint32_t count, uint32_t* addr, uint32_t* start, uint32
             *start = (uint32_t)(uint64_t) mod_start;
             *end = (uint32_t)(uint64_t) mod_end;
             init_ref = mod_start;
+            init_ref_end = mod_end;
             return;
         }
     }
@@ -153,6 +155,3 @@ void print_mempry_map() {
                memory_map[i].type == 1 ? "Available" : memory_map[i].type == 0 ? "Kernel" : "Reserved");
     }
 }
-
-
-
