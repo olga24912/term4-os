@@ -23,42 +23,33 @@ uint32_t str_to_int(char* s, size_t len) {
 }
 
 int add_one_file() {
-    printf("start: %p; current: %p, end: %p\n", init_ref, current_addr, init_ref_end);
-    current_addr += 4 - ((uint64_t)current_addr)%4;
     if ((uint64_t)current_addr % 4 == 0) current_addr -= 4;
+    current_addr += (4 - (((uint64_t)current_addr)%4));
 
     if (current_addr >= init_ref_end) {
         return 0;
     }
 
-    printf("ok\n");
-    struct cpio_header* header = (struct cpio_header*)current_addr;
-    printf("ok\n");
+    struct cpio_header* header = (struct cpio_header*)VA(current_addr);
     current_addr += sizeof(struct cpio_header);
-
-    printf("current: %p\n",  current_addr);
-
-    printf("%c\n", *((char*)header));
-    printf("%s\n", header->namesize);
 
     uint32_t name_len = str_to_int(header->namesize, 8);
 
-    printf("name_len: %d\n", name_len);
-
     char* name = malloc_small(name_len + 1);
     for (uint32_t i = 0; i < name_len; ++i) {
-        name[i] = ((char*)current_addr)[i];
+        name[i] = ((char*)VA(current_addr))[i];
     }
-
     name[name_len] = 0;
+    current_addr += name_len;
 
-    printf("%s\n", name);
-
-    if (name_len == 10 && strncmp(name, END_OF_ARCHIVE, name_len)) {
+    if (name_len == 11 && strncmp(name, END_OF_ARCHIVE, 11) == 0) {
         return 0;
     }
 
-    current_addr += name_len;
+    while (name_len > 0 && name[0] != '/') {
+        ++name;
+        --name_len;
+    }
 
     uint32_t mode = str_to_int(header->mode, 8);
 
@@ -69,10 +60,10 @@ int add_one_file() {
 
         uint32_t filesize = str_to_int(header->filesize, 8);
 
-        current_addr += 4 - ((uint64_t)current_addr)%4;
         if ((uint64_t)current_addr % 4 == 0) current_addr -= 4;
+        current_addr += 4 - ((uint64_t)current_addr)%4;
 
-        write(file, current_addr, filesize);
+        write(file, VA(current_addr), filesize);
 
         current_addr += filesize;
     }
@@ -83,4 +74,5 @@ void initramfs_to_fs() {
     printf("START add to initranfs\n");
     current_addr = init_ref;
     while (add_one_file());
+    printf("FINISH add to initranfs\n");
 }

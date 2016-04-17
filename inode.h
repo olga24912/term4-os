@@ -9,5 +9,5 @@ struct inode {
     struct inode* neighbor;
     struct inode* child;
     void* file_start; // start of file
-    uint8_t is_dir; // true if it is directory and false if folder
+    uint8_t is_dir; // true if it is directory and false if file
 };

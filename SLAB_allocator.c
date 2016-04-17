@@ -67,7 +67,7 @@ void* allocate_slab_small(unsigned int size, unsigned int al) {
     slab_control->cnt_ref = small_slab_cnt(slab_control);
     slab_control->head=0;
 
-    descriptors[get_phys_adr((virt_t)((char*)buf))].slab = slab_control;
+    descriptors[get_phys_adr((virt_t)((char*)buf))/PAGE_SIZE].slab = slab_control;
 
     size_t cnt = small_slab_cnt(slab_control);
 
@@ -83,7 +83,7 @@ void* allocate_slab_big(unsigned int size, unsigned int al) {
 
     struct slabctl* slab_control = (struct slabctl*)((char*)buf + CNT_PAGES * PAGE_SIZE - sizeof(struct slabctl));
     for (int i = 0; i < CNT_PAGES; ++i) {
-        descriptors[get_phys_adr((virt_t)((char*)buf + i*PAGE_SIZE))].slab = slab_control;
+        descriptors[get_phys_adr((virt_t)((char*)buf + i*PAGE_SIZE))/PAGE_SIZE].slab = slab_control;
     }
 
     slab_control->alignment = al;
@@ -131,8 +131,8 @@ void* allocate_block(struct slabctl* slab) {
 
 void free_block(void *addr) {
     void* pg_addr = get_page_adr(addr);
-    struct slabctl* sl = descriptors[get_phys_adr((virt_t)pg_addr)].slab;
-    lock(&sl->lock);
+    struct slabctl* sl = descriptors[get_phys_adr((virt_t)pg_addr)/PAGE_SIZE].slab;
+    start_critical_section();
     int id;
     if (is_big_slab(sl)) {
         id = get_big_id(sl, addr, CNT_PAGES);
@@ -146,7 +146,7 @@ void free_block(void *addr) {
         sl->next = *((struct slabctl**)sl->slab_list_head);
         *((struct slabctl**)sl->slab_list_head) = sl;
     }
-    unlock(&sl->lock);
+    end_critical_section();
 }
 
 void* allocate_block_in_slab_system (struct slabctl** slab_sys) {
