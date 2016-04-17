@@ -119,7 +119,7 @@ void init_buddy() {
     size_t  max_mem_size = ((memory_map[memory_map_size - 1].base_addr + memory_map[memory_map_size - 1].length));
 
     boot_size = max_mem_size/(2<<20)*PAGE_SIZE*2;
-    size_t descriptors_size = max_mem_size/PAGE_SIZE;
+    size_t descriptors_size = (max_mem_size + PAGE_SIZE - 1)/PAGE_SIZE;
 
     max_order = 1;
     while ((1ll<<max_order) <= (int)descriptors_size) {

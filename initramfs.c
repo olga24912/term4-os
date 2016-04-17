@@ -35,7 +35,9 @@ int add_one_file() {
 
     uint32_t name_len = str_to_int(header->namesize, 8);
 
+
     char* name = malloc_small(name_len + 1);
+    void* addr_for_free = name;
     for (uint32_t i = 0; i < name_len; ++i) {
         name[i] = ((char*)VA(current_addr))[i];
     }
@@ -67,6 +69,7 @@ int add_one_file() {
 
         current_addr += filesize;
     }
+    free_block(addr_for_free);
     return 1;
 }
 

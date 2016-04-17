@@ -47,16 +47,16 @@ size_t big_slab_cnt(struct slabctl* slab, int cnt_page) {
 }
 
 
-int get_big_id(struct slabctl* slab, void* addr, int cnt_page) {
+uint16_t get_big_id(struct slabctl* slab, void* addr, int cnt_page) {
     uint64_t start_page_adr = align_up((uint64_t)get_page_adr(slab)-(cnt_page - 1)*PAGE_SIZE, slab->alignment);
     uint64_t buffsize = get_buffsize(slab);
-    return (int)(((uint64_t)addr - start_page_adr)/buffsize);
+    return (uint16_t)(((uint64_t)addr - start_page_adr)/buffsize);
 }
 
-int get_small_id (struct slabctl* slab, void* addr) {
+uint16_t get_small_id (struct slabctl* slab, void* addr) {
     uint64_t start_page_adr = align_up((uint64_t)get_page_adr(slab), slab->alignment);
     uint64_t buffsize = get_buffsize(slab);
-    return (int)(((uint64_t)addr - start_page_adr)/buffsize);
+    return (uint16_t)(((uint64_t)addr - start_page_adr)/buffsize);
 }
 
 void* allocate_slab_small(unsigned int size, unsigned int al) {
@@ -72,7 +72,7 @@ void* allocate_slab_small(unsigned int size, unsigned int al) {
     size_t cnt = small_slab_cnt(slab_control);
 
     for (uint16_t i = 0; i < cnt; ++i) {
-        uint16_t * curbuff = small_slab_get_buffer_addr(slab_control, i);
+        uint16_t* curbuff = small_slab_get_buffer_addr(slab_control, i);
         *curbuff = i + (uint16_t)1;
     }
     return slab_control;
@@ -124,8 +124,10 @@ void* allocate_block(struct slabctl* slab) {
         return res;
     }
     void* res = small_slab_get_buffer_addr(slab, slab->head);
+    assert(*((uint16_t*)res) < small_slab_cnt(slab));
     slab->head = *((uint16_t*)res);
     slab->cnt_ref--;
+    assert((uint64_t)res < (uint64_t)slab);
     return res;
 }
 
@@ -133,7 +135,7 @@ void free_block(void *addr) {
     void* pg_addr = get_page_adr(addr);
     struct slabctl* sl = descriptors[get_phys_adr((virt_t)pg_addr)/PAGE_SIZE].slab;
     start_critical_section();
-    int id;
+    uint16_t id;
     if (is_big_slab(sl)) {
         id = get_big_id(sl, addr, CNT_PAGES);
     } else {
@@ -141,6 +143,7 @@ void free_block(void *addr) {
     }
     *((uint16_t*)addr) = sl->head;
     sl->head = id;
+    assert(addr == small_slab_get_buffer_addr(sl, id));
     sl->cnt_ref++;
     if (sl->cnt_ref == 1) {
         sl->next = *((struct slabctl**)sl->slab_list_head);
